@@ -8,9 +8,19 @@ const port = 3000;
 app.get('/api/employees', (req, res) => {
   let selectQuery = 'SELECT * FROM employee';
   const queryParams = [];
+  const whereClauses = [];
   if (req.query.department) {
-    selectQuery += ' WHERE department = ?';
+    whereClauses.push('department = ?');
     queryParams.push(req.query.department);
+  }
+  if (req.query.hired_year) {
+    whereClauses.push('hired_year = ?');
+    queryParams.push(req.query.hired_year);
+  }
+  // add a WHERE clause to the select query
+  if (whereClauses.length > 0) {
+    const joinedClauses = whereClauses.join(' AND ');
+    selectQuery += ` WHERE ${joinedClauses}`;
   }
   // send an SQL query to get all employees
   connection.query(selectQuery, queryParams, (err, results) => {
